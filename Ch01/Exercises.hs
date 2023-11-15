@@ -13,7 +13,12 @@ import Prelude hiding (product)
 -- Complete the following block comment.
 {-
 double (double 2)
-= TODO continue
+= double 2 + double 2
+= (2 + 2) + double 2
+= (2 + 2) + (2 + 2)
+= 4 + (2 + 2)
+= 4 + 4
+= 8
 -}
 
 ------------------------------------------------------------------------
@@ -28,9 +33,10 @@ double (double 2)
 -- Complete the following block comment.
 {-
 sum [x]
-= TODO continue
+= x + sum []
+= x + 0
+= x
 -}
-
 
 ------------------------------------------------------------------------
 --                          Exercise 1.3 (*)                          --
@@ -39,11 +45,14 @@ sum [x]
 -- and show using your definition that product [2,3,4] == 24.
 
 product :: Num p => [p] -> p
-product [] = {- TODO -} undefined
-product (n:ns) = {- TODO -} undefined
-
+product [] = 1 --base case
+product (n:ns) = n * product ns --recursive case
 
 {-
 product [2,3,4]
-= TODO
+= 2 * product [3,4]
+= 2 * 3 * product [4]
+= 2 * 3 * 4 * product []
+= 2 * 3 * 4 * 1
+= 24
 -}
