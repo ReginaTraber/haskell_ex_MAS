@@ -7,19 +7,19 @@ module Exercises where
 -- Uncomment your answers in order for them to be checked by the compiler.
 
 e3_1_1 = ['a','b','c']
--- e3_1_1 :: TODO
+e3_1_1 :: [Char]
 
 e3_1_2 = ('a','b','c')
--- e3_1_2 :: TODO
+e3_1_2 :: (Char, Char, Char)
 
 e3_1_3 = [(False,'O'),(True,'1')]
--- e3_1_3 :: TODO
+e3_1_3 :: [(Bool, Char)]
 
 e3_1_4 = ([False,True],['0','1'])
--- e3_1_4 :: TODO
+e3_1_4 :: ([Bool], [Char])
 
 e3_1_5 = [tail, init, reverse]
--- e3_1_5 :: TODO
+e3_1_5 :: [[a] -> [a]]
 
 
 -------------------------------------------------------------------------------
@@ -30,19 +30,19 @@ e3_1_5 = [tail, init, reverse]
 -- your defined function may be more general than the types defined below.
 
 bools :: [Bool]
-bools = {- TODO -} undefined
+bools = [True]
 
 nums :: [[ Int ]]
-nums = {- TODO -} undefined
+nums = [[1]]
 
 add :: Num a => a -> a -> a -> a
-add {- TODO -} = {- TODO -} undefined
+add x y z = x + y + z
 
 copy :: b -> (b, b)
-copy {- TODO -} = {- TODO -} undefined
+copy x = (x,x)
 
 apply :: (t1 -> t2) -> t1 -> t2
-apply {- TODO -} = {- TODO -} undefined
+apply f x = f x
 
 
 -------------------------------------------------------------------------------
@@ -55,22 +55,22 @@ apply {- TODO -} = {- TODO -} undefined
 
 
 second xs = head (tail xs)
--- second :: TODO
+-- second :: [a] -> a
 
 swap (x,y) = (y,x)
--- swap :: TODO
+-- swap :: (b, a) -> (a, b)
 
 pair x y = (x,y)
--- pair :: TODO
+-- pair :: a -> b -> (a, b)
 
 double x = x*2
--- double :: TODO
+--double :: Num a => a -> a
 
 palindrome xs = reverse xs == xs
--- palindrome :: TODO
+-- palindrome :: Eq a => [a] -> Bool
 
 twice f x = f (f x)
--- twice :: TODO
+--twice :: (t -> t) -> t -> t
 
 
 -------------------------------------------------------------------------------
@@ -79,7 +79,24 @@ twice f x = f (f x)
 -- Check your answers to the preceding three questions using GHCi.
 -- Copy and paste your ghci session into the block comment below.
 {-
-TODO
+ghci> second xs = head (tail xs)
+ghci> :t second
+second :: [a] -> a
+ghci> swap (x,y) = (y,x)
+ghci> :t swap
+swap :: (b, a) -> (a, b)
+ghci> pair x y = (x,y)
+ghci> :t pair
+pair :: a -> b -> (a, b)
+ghci> double x = x*2
+ghci> :t double
+double :: Num a => a -> a
+ghci> palindrome xs = reverse xs == xs
+ghci> :t palindrome
+palindrome :: Eq a => [a] -> Bool
+ghci> twice f x = f (f x)
+ghci> :t twice
+twice :: (t -> t) -> t -> t
 -}
 
 -------------------------------------------------------------------------------
@@ -92,5 +109,12 @@ TODO
 
 -- Type your answer into the block comment below.
 {-
-TODO
+In Haskell, functions are not generally instances of the Eq class because comparing functions for equality can be a complex and undecidable problem due to the nature of functions and the halting problem.
+The Eq class in Haskell is defined as follows:
+class Eq a where
+    (==) :: a -> a -> Bool
+    (/=) :: a -> a -> Bool
+For a type to be an instance of Eq, you need to provide definitions for the equality (==) and inequality (/=) operators.
+However, functions, being potentially infinite and undecidable in their behavior, cannot be directly compared for equality.
+If the functions are defined for range of values, it would be possible to test them for equality.
 -}
