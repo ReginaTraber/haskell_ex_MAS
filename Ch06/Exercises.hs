@@ -14,7 +14,8 @@ import Prelude hiding ((^), and, concat, replicate, (!!), elem)
 -- sumdown 3 should return the result 3 + 2 + 1 + 0 = 6.
 
 sumdown :: Int -> Int
-sumdown = {- TODO -} undefined
+sumdown 0 = 0
+sumdown n = n + sumdown (n - 1)
 
 ------------------------------------------------------------------------
 --                          Exercise 6.3 (*)                          --
@@ -24,13 +25,16 @@ sumdown = {- TODO -} undefined
 -- expression 2 ^ 3 is evaluated using your definition.
 
 (^) ::  Int -> Int -> Int
--- ??? ^# ??? = ???
--- ??? ^# ??? = ???
-(^) = {- TODO -} undefined
+(^) _ 0 = 1 -- base case
+--(^) 0 _ = 0 --to break earlier (optional)
+(^) n e = n * ((^) n (e - 1))
 
 {-
 2^3
-= TODO continue
+= 2 * (2^2)
+= 2 * (2 * (2^1))
+= 2 * (2 * (2 * (2^0)))
+= 2 * (2 * (2 * 1) * 1) --2^0 = 1 base case
 -}
 
 ------------------------------------------------------------------------
@@ -57,13 +61,24 @@ sumdown = {- TODO -} undefined
 
 {-
 length [1,2,3]
-= TODO continue
+= 1 + length [2,3]
+= 1 + 1 + length [3]
+= 1 + 1 + 1 + length []
+= 1 + 1 + 1 + 0 -- use base case
+= 3
 
 drop 3 [1,2,3,4,5]
-= TODO continue
+= drop (3 - 1) [2,3,4,5]
+= drop (2 - 1) [3,4,5]
+= drop (1 - 1) [4,5]
+= drop 0 [4,5]
+= [4,5] -- use base case
 
 init [1,2,3]
-= TODO continue
+= 1 : init [2,3]
+= 1 : 2 : init [3]
+= 1 : 2 : []
+= [1,2] --use base case which is [_] = []
 -}
 
 
@@ -81,9 +96,9 @@ init [1,2,3]
 
 
 and :: [Bool] -> Bool
--- and [] = ???
--- and (b:bs) = ???
-and = {- TODO -} undefined
+and [] = True
+and (b:bs) = b && and bs
+--and (b:bs) = b && (and bs)
 
 
 
@@ -91,37 +106,33 @@ and = {- TODO -} undefined
 --     concat :: [[a]] -> [a]
 
 concat :: [[a]] -> [a]
--- concat [] = ???
--- concat (xs:xss) = ???
-concat = {- TODO -} undefined
+concat [] = []
+concat (xs:xss) = xs ++ (concat xss)
+--concat (xs:xss) = xs:(concat xss)
 
 
 -- (c) Produce a list with a non-negative number of identical elements:
 --     replicate :: Int -> a -> [a]
 
 replicate :: Int -> a -> [a]
--- replicate 0 ??? = ???
--- replicate n ??? = ???
-replicate = {- TODO -} undefined
+replicate 0 _ = []
+replicate n x = x:(replicate (n - 1) x)
 
 
 -- (d) Select the nth element of a list:
 --     (!!) :: [a] -> Int -> a
 
 (!!) :: [a] -> Int -> a
--- ??? !! ??? = ???
--- ??? !! ??? = ???
-(!!) = {- TODO -} undefined
-
+(!!) (x:_) 0 = x
+--(!!) [] _ = [] --has not to be defined would anyway be an error
+(!!) (x:xs) n = (!!) xs (n-1)
 
 -- (e) Decide if a value is an element of a list:
 --     elem :: Eq a => a -> [a] -> Bool
 
 elem :: Eq a => a -> [a] -> Bool
--- elem ??? = ???
--- elem ??? = ???
-elem = {- TODO -} undefined
-
+elem _ [] = False
+elem k (x:xs) = k == x || elem k xs
 
 ------------------------------------------------------------------------
 --                          Exercise 6.7 (**)                         --
@@ -134,10 +145,11 @@ elem = {- TODO -} undefined
 -- insert or isort, but should be defined using explicit recursion.
 
 merge :: Ord a => [a] -> [a] -> [a]
--- merge ??? = ???
--- merge ??? = ???
--- merge ??? = ???
-merge = {- TODO -} undefined
+merge [] ys = ys
+merge xs [] = xs
+merge (x:xs) (y:ys)
+    | x <= y = x : merge xs (y:ys)
+    | otherwise = y : merge (x:xs) ys
 
 
 ------------------------------------------------------------------------
@@ -153,7 +165,9 @@ merge = {- TODO -} undefined
 
 
 halve :: [a] -> ([a], [a])
-halve = {- TODO -} undefined
+halve = \xs -> (take (length xs `div` 2) xs, drop (length xs `div` 2) xs)
 
 msort :: Ord a => [a] -> [a]
-msort = {- TODO -} undefined
+msort [] = [] --an empty list is already sorted
+msort [x] = [x] --a singleton list is already sorted
+msort xs = merge (msort (fst (halve xs))) (msort (snd (halve xs)))
