@@ -13,18 +13,18 @@ module Exercises where
 -- (c) pattern matching.
 
 safeTailA :: [a] -> [a]
--- safeTailA xs = if ??? then ??? else ???
-safeTailA = {- TODO -} undefined
+safeTailA xs = if null xs then xs else tail xs
+--safeTailA xs = if null xs then [] else tail xs
 
 safeTailB :: [a] -> [a]
--- safeTailB xs | ??? = ???
---              | ??? = ???
-safeTailB = {- TODO -} undefined
+safeTailB xs | null xs = xs
+             | otherwise = tail xs
+--safeTailB xs | null xs = []
+--             | otherwise = tail xs
 
 safeTailC :: [a] -> [a]
--- safeTailC ??? = ???
--- safeTailC ??? = ???
-safeTailC = {- TODO -} undefined
+safeTailC [] = []
+safeTailC (_:xs) = xs
 
 
 
@@ -39,4 +39,5 @@ safeTailC = {- TODO -} undefined
 -- mult x y z = x*y*z
 
 mult :: Int -> (Int -> (Int -> Int))
-mult = {- TODO -} undefined
+--mult :: Int -> Int -> Int -> Int
+mult = \x -> (\y -> (\z -> x*y*z))

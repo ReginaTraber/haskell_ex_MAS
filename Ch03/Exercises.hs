@@ -116,5 +116,5 @@ class Eq a where
     (/=) :: a -> a -> Bool
 For a type to be an instance of Eq, you need to provide definitions for the equality (==) and inequality (/=) operators.
 However, functions, being potentially infinite and undecidable in their behavior, cannot be directly compared for equality.
-If the functions are defined for range of values, it would be possible to test them for equality.
+If the functions are defined for a finite range of values, it would be possible to test them for equality.
 -}

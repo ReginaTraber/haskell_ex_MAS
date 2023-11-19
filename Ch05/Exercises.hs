@@ -10,7 +10,7 @@ import Prelude hiding (replicate)
 -- function sum :: [Int] -> Int in your definition.
 
 e5_1 :: Int
-e5_1 = sum [ {- TODO -} undefined | {- TODO -} undefined ]
+e5_1 = sum [x^2 | x <- [1..100]]
 
 
 ------------------------------------------------------------------------
@@ -24,7 +24,7 @@ e5_1 = sum [ {- TODO -} undefined | {- TODO -} undefined ]
 -- [True,True,True]
 
 replicate :: Int -> a -> [a]
-replicate n x = [ {- TODO -} undefined | {- TODO -} undefined ]
+replicate n x = [x | _ <- [1..n]]
 
 
 ------------------------------------------------------------------------
@@ -45,4 +45,5 @@ find :: Eq a => a -> [(a,b)] -> [b]
 find k t = [v | (k',v) <- t, k == k']
 
 positions :: Eq a => a -> [a] -> [Int]
-positions x xs = {- TODO -} undefined
+--positions x xs = find x (zip xs [0..])
+positions x xs = x `find` (xs `zip` [0..])
