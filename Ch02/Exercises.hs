@@ -37,7 +37,7 @@ ghci> reverse [1,2,3,4,5]
 [5,4,3,2,1]
 -}
 
---test.hs
+-- test.hs
 {-
 double x = x +x
 quadruple x = double (double x)
@@ -71,10 +71,75 @@ ghci> average [1,2,3,4,5]
 -- 2^3*4 2*3+4*5 2+3*4^5
 
 e_2_2_a :: Int
-e_2_2_a = (2^3)*4
+e_2_2_a = (2 ^ 3) * 4
 
 e_2_2_b :: Int
-e_2_2_b = (2*3)+(4*5)
+e_2_2_b = (2 * 3) + (4 * 5)
 
 e_2_2_c :: Int
-e_2_2_c = 2+(3*(4^5))
+e_2_2_c = 2 + (3 * (4 ^ 5))
+
+-------------------------------------------------------------------------------
+--                              Exercise 2.3 (*)                             --
+-------------------------------------------------------------------------------
+-- The script below contains three syntactic errors. Correct these errors and then
+-- check that your script works properly using GHCi.
+
+computeN :: Int
+computeN = a `div` length xs
+  where
+    a = 10
+    xs = [1, 2, 3, 4, 5]
+
+-------------------------------------------------------------------------------
+--                              Exercise 2.4 (*)                             --
+-------------------------------------------------------------------------------
+-- The library function 'last' selects the last element of a non-empty list; for example,
+-- last [1,2,3,4,5] = 5. Show how the function last could be defined in terms of the other library
+-- functions introduced in this chapter. Can you think of another possible definition?
+
+{-
+last :: [a] -> a
+last xs = head (drop (length xs - 1) xs)
+last xs = head (reverse xs)
+last xs = xs !! (length xs - 1)
+-}
+
+-- ['a', 'b', 'c'] !! 2
+-- 'c'
+
+-- head [1, 2, 3]
+-- 1
+
+-- reverse [2,5,7]
+-- [7,5,2]
+
+-- length ['a', 'b', 'c']
+-- 3
+
+-- drop 3 [1,2,3,4,5]
+-- [4,5]
+
+-------------------------------------------------------------------------------
+--                              Exercise 2.5 (*)                             --
+-------------------------------------------------------------------------------
+-- The library function 'init' removes the last element from a non-empty list; for example,
+-- init [1,2,3,4,5] = [1,2,3,4]. Show how 'init' could similarly be defined in two different ways.
+
+{-
+init :: [a] -> [a]
+init xs = take (length xs - 1) xs
+init xs = reverse (tail (reverse xs))
+-}
+
+-- take 5 "Hello World!"
+-- "Hello"
+
+-- length ['a', 'b', 'c']
+-- 3
+
+-- tail [1, 2, 3]
+-- [2,3]
+
+-- reverse [2,5,7]
+-- [7,5,2]
