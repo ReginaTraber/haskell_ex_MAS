@@ -8,9 +8,11 @@
 {-# HLINT ignore "Use concatMap" #-}
 {-# HLINT ignore "Use list comprehension" #-}
 {-# HLINT ignore "Eta reduce" #-}
+{-# HLINT ignore "Avoid lambda" #-}
+{-# HLINT ignore "Use odd" #-}
 module Exercises where
 
-import Prelude hiding (any, curry, dropWhile, map, takeWhile, uncurry)
+import Prelude hiding (any, curry, dropWhile, filter, id, map, takeWhile, uncurry, (.))
 
 
 ------------------------------------------------------------------------
@@ -228,3 +230,161 @@ altMap f g (x : xs) = f x : altMap g f xs
 
 luhn :: [Int] -> Bool
 luhn = (== 0) . (`mod` 10) . sum . altMap id (uncurry (+) . (`divMod` 10) . (* 2)) . reverse
+
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+--                          Book                                      --
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+--                          7.1 Basic concepts                        --
+------------------------------------------------------------------------
+
+---- twice: takes a function and a value, and returns the result of
+---- applying the function twice to the value.
+
+twice :: (a -> a) -> a -> a
+twice f x = f (f x)
+
+-- twice (*2) 3 = 12
+-- twice reverse [1,2,3] = [1,2,3]
+
+------------------------------------------------------------------------
+--                          7.2 Processing lists                      --
+------------------------------------------------------------------------
+
+-- map: applies a function to every element of a list, producing a new list
+-- map (map (+1)) [[1,2,3],[4,5]] = [[2,3,4],[5,6]]
+map' :: (a -> b) -> [a] -> [b]
+map' f xs = [f x | x <- xs]
+
+-- recursion
+{-
+map :: (a -> b) -> [a] -> [b]
+map _ [] = []
+map f (x : xs) = f x : map f xs
+-}
+-- map (+1) [1,3,5,7] = [2,4,6,8]
+-- map even [1,2,3,4] = [False,True,False,True]
+-- map reverse ["abc","def","ghi"] = ["cba","fed","ihg"]
+{-
+map (map (+1)) [[1,2,3],[4,5]]
+= { applying the outer map }
+[map (+1) [1,2,3], map (+1) [4,5]]
+= { applying the inner maps }
+[[2,3,4],[5,6]]
+-}
+
+-- filter: selects every element from a list that satisfies a predicate
+filter :: (a -> Bool) -> [a] -> [a]
+filter p xs = [x | x <- xs, p x]
+
+-- recursion
+{-
+filter :: (a -> Bool) -> [a] -> [a]
+filter _ [] = []
+filter p (x : xs)
+  | p x = x : filter p xs
+  | otherwise = filter p xs
+-}
+-- filter even [1..10] = [2,4,6,8,10]
+-- filter (>5) [1..10] = [6,7,8,9,10]
+-- filter (/=' ') "abc def ghi" = "abcdefghi"
+
+-- all: decides if every element of a list satisfies a predicate
+all' :: (a -> Bool) -> [a] -> Bool
+all' p xs = and (map p xs)
+
+-- all even [2,4,6,8] = True
+
+-- any: decides if any element of a list satisfies a predicate
+any' :: (a -> Bool) -> [a] -> Bool
+any' p xs = or (map p xs)
+
+-- any odd [2,4,6,8] = False
+
+-- takeWhile: selects elements from a list while they satisfy a predicate
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' _ [] = []
+takeWhile' p (x : xs)
+  | p x = x : takeWhile' p xs
+  | otherwise = []
+
+-- takeWhile even [2,4,6,7,8] = [2,4,6]
+
+-- dropWhile: removes elements from a list while they satisfy a predicate
+dropWhile' :: (a -> Bool) -> [a] -> [a]
+dropWhile' _ [] = []
+dropWhile' p (x : xs)
+  | p x = dropWhile' p xs
+  | otherwise = x : xs
+
+-- dropWhile even [2,4,6,7,8] = [7,8]
+
+-- sumsqreven: sums the squares of all the even numbers from a list
+sumsqreven :: [Int] -> Int
+sumsqreven ns = sum (map (^ 2) (filter even ns))
+
+-- sumsqreven [1,2,3,4,5] = 20
+-- sumsqreven [] = 0
+
+{-
+filter :: (a -> Bool) -> [a] -> [a]
+filter p xs = [x | x <- xs, p x]
+
+map :: (a -> b) -> [a] -> [b]
+map f xs = [f x | x <- xs]
+
+sum :: (Num a) => [a] -> a
+sum = foldr (+) 0
+
+even :: Integral a => a -> Bool
+even n = n `mod` 2 == 0
+
+(^) :: (Num a, Integral b) => a -> b -> a
+_ ^ 0 = 1
+x ^ n = x * x ^ (n - 1)
+-}
+
+------------------------------------------------------------------------
+--                          7.5 The composition operator              --
+------------------------------------------------------------------------
+
+(.) :: (b -> c) -> (a -> b) -> a -> c
+f . g = \x -> f (g x)
+
+-- idenitity function: id . f = f and f . id = f
+id :: a -> a
+id = \x -> x
+
+-- composition is associative: (f . g) . h = f . (g . h)
+
+-- compose: composition of a list of functions -- compose [f,g,h,i] = f . g . h . i
+compose :: [a -> a] -> (a -> a)
+compose = foldr (.) id
+
+{-
+(.) :: (b -> c) -> (a -> b) -> a -> c
+f . g = \x -> f (g x)
+
+id :: a -> a
+id = \x -> x
+
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr _ v [] = v
+foldr f v (x : xs) = f x (foldr f v xs)
+-}
+
+-- odd' n = not (even n)
+odd' :: Int -> Bool
+odd' = not . even
+
+-- twice' f x = f (f x)
+twice' :: (a -> a) -> a -> a
+twice' f = f . f
+
+-- sumsqreven' ns = sum (map (^ 2) (filter even ns))
+sumsqreven' :: [Int] -> Int
+sumsqreven' = sum . map (^ 2) . filter even
