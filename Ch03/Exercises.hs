@@ -6,25 +6,45 @@ module Exercises where
 -- What are the types of the following values?
 -- Uncomment your answers in order for them to be checked by the compiler.
 
+e3_1_1 :: [Char]
 e3_1_1 = ['a', 'b', 'c']
 
-e3_1_1 :: [Char]
-
-e3_1_2 = ('a', 'b', 'c')
 
 e3_1_2 :: (Char, Char, Char)
+e3_1_2 = ('a', 'b', 'c')
 
-e3_1_3 = [(False, 'O'), (True, '1')]
 
 e3_1_3 :: [(Bool, Char)]
+e3_1_3 = [(False, 'O'), (True, '1')]
 
-e3_1_4 = ([False, True], ['0', '1'])
 
 e3_1_4 :: ([Bool], [Char])
-
-e3_1_5 = [tail, init, reverse]
+e3_1_4 = ([False, True], ['0', '1'])
 
 e3_1_5 :: [[a] -> [a]]
+e3_1_5 = [tail, init, reverse]
+
+-- tail :: [a] -> [a]
+-- tail (_ : xs) = xs
+-- Return all the elements of a list except the first one. The list must be non-empty
+-- tail [1, 2, 3] = [2,3]
+-- tail [1] = []
+-- tail [] = *** Exception: Prelude.tail: empty list
+
+-- init :: [a] -> [a]
+-- init [_] = []
+-- init (x : xs) = x : init xs
+-- Return all the elements of a list except the last one. The list must be non-empty
+-- init [1, 2, 3] = [1,2]
+-- init [1] = []
+-- init [] = *** Exception: Prelude.init: empty list
+
+-- reverse :: [a] -> [a]
+-- reverse [] = []
+-- reverse (x : xs) = reverse xs ++ [x]
+-- reverse xs returns the elements of xs in reverse order. xs must be finite
+
+
 -------------------------------------------------------------------------------
 --                              Exercise 3.2 (*)                             --
 -------------------------------------------------------------------------------
@@ -36,12 +56,10 @@ e3_1_5 :: [[a] -> [a]]
 
 bools :: [Bool]
 bools = [True]
-
 -- bools = [False,True]
 
 nums :: [[Int]]
 nums = [[1]]
-
 -- nums = [[1,2],[3,4],[5,6]]
 
 add :: (Num a) => a -> a -> a -> a
@@ -61,29 +79,45 @@ apply f x = f x
 -- the functions are defined using overloaded operators.
 -- Uncomment your answers in order for them to be checked by the compiler.
 
+
+second :: [a] -> a
 second xs = head (tail xs)
+-- second (_ : xs) = head xs
+-- secons [1,2,3,4] = 2
 
--- second :: [a] -> a
+-- tail :: [a] -> [a]
+-- tail (_ : xs) = xs
+-- tail [1,2,3,4] = [2,3,4]
 
+-- head :: [a] -> a
+-- head (x : _) = x
+-- head [2,3,4] = 2
+
+swap :: (a, b) -> (b, a)
 swap (x, y) = (y, x)
+-- swap (x, y) = (y, x)
+-- swap (1,2) = (2,1)
 
--- swap :: (b, a) -> (a, b)
-
+pair :: a -> b -> (a, b)
 pair x y = (x, y)
+-- pair x y = (x, y)
+-- pair 1 2 = (1,2)
 
--- pair :: a -> b -> (a, b)
-
+double :: Num a => a -> a
 double x = x * 2
+-- double x = x * 2
+-- double 2 = 4
 
--- double :: Num a => a -> a
-
+palindrome :: Eq a => [a] -> Bool
 palindrome xs = reverse xs == xs
+-- palindrome [1,2,3,2,1] = True
+-- palindrome [1,2,3,4,5] = False
 
--- palindrome :: Eq a => [a] -> Bool
-
+twice :: (t -> t) -> t -> t
 twice f x = f (f x)
-
--- twice :: (t -> t) -> t -> t
+-- twice (*2) 2 = 8
+-- twice reverse [1,2,3,4] = [1,2,3,4]
+-- twice (++ "ab") "test" = "testabab"
 
 -------------------------------------------------------------------------------
 --                              Exercise 3.4 (*)                             --
@@ -91,8 +125,9 @@ twice f x = f (f x)
 -- Check your answers to the preceding three questions using GHCi.
 -- Copy and paste your ghci session into the block comment below.
 {-
+-- console: ghci
 ghci> second xs = head (tail xs)
-ghci> :t second
+ghci> :t second --alternative: :type second
 second :: [a] -> a
 ghci> swap (x,y) = (y,x)
 ghci> :t swap

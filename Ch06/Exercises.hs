@@ -6,7 +6,7 @@
 {-# HLINT ignore "Use splitAt" #-}
 module Exercises where
 
-import Prelude hiding ((^), and, concat, replicate, (!!), elem)
+import Prelude hiding (and, concat, drop, elem, even, init, odd, product, replicate, zip, (!!), (++), (^))
 import GHC.Stack (callStack)
 
 ------------------------------------------------------------------------
@@ -252,3 +252,347 @@ takeElements n (x:xs)
 lastElement :: [a] -> a
 lastElement [x] = x
 lastElement (_:xs) = lastElement xs
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+--                          Book                       --
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+--                          6.1 Basic concepts                        --
+------------------------------------------------------------------------
+
+-- factorial
+fac :: Int -> Int
+fac 0 = 1 -- base case
+fac n = n * fac (n - 1) -- recursive case
+
+-- not recursive
+{-
+fac :: Int -> Int
+fac n = product [1 .. n]
+-}
+
+{-
+fac 3
+= { applying fac }
+3 * fac 2
+= { applying fac }
+3 * (2 * fac 1)
+= { applying fac }
+3 * (2 * (1 * fac 0))
+= { applying fac }
+3 * (2 * (1 * 1))
+= { applying * }
+6
+-}
+
+---- multiplication operator *
+{-
+(*) :: Int -> Int -> Int
+m * 0 = 0 -- base case
+m * n = m + (m * (n - 1)) -- recursive case
+-- formalises the idea that multiplication can
+-- be reduced to repeated addition.
+-}
+
+{-
+4 *' 3
+= { applying *' }
+4 + (4 *' 2)
+= { applying *' }
+4 + (4 + (4 *' 1))
+= { applying *' }
+4 + (4 + (4 + (4 *' 0)))
+= { applying *' }
+4 + (4 + (4 + 0))
+= { applying + }
+12
+-}
+
+------------------------------------------------------------------------
+--                          6.2 Recursion on lists                    --
+------------------------------------------------------------------------
+
+-- 2:(3:(4:[])) = [2,3,4]
+
+---- product: product [2,3,4] = 24
+product' :: (Num a) => [a] -> a
+product' [] = 1
+product' (n : ns) = n * product' ns
+
+{-
+product' [2,3,4]
+= { applying product' }
+2 * product' [3,4]
+= { applying product' }
+2 * (3 * product' [4])
+= { applying product' }
+2 * (3 * (4 * product' []))
+= { applying product' }
+2 * (3 * (4 * 1))
+= { applying * }
+24
+-}
+
+---- length: length [2,3,4] = 3
+length' :: [a] -> Int
+length' [] = 0
+length' (_ : xs) = 1 + length' xs
+
+{-
+length' [2,3,4]
+= { applying length' }
+1 + length' [3,4]
+= { applying length' }
+1 + (1 + length' [4])
+= { applying length' }
+1 + (1 + (1 + length' []))
+= { applying length' }
+1 + (1 + (1 + 0))
+= { applying + }
+3
+-}
+
+---- reverse : reverse [1,2,3] = [3,2,1]
+reverse' :: [a] -> [a]
+reverse' [] = []
+reverse' (x : xs) = reverse' xs ++ [x]
+
+{-
+reverse' [1,2,3]
+= { applying reverse' }
+reverse' [2,3] ++ [1]
+= { applying reverse' }
+(reverse' [3] ++ [2]) ++ [1]
+= { applying reverse' }
+((reverse' [] ++ [3]) ++ [2]) ++ [1]
+= { applying reverse' }
+(([] ++ [3]) ++ [2]) ++ [1]
+= { applying ++ }
+([3] ++ [2]) ++ [1]
+= { applying ++ }
+[3,2] ++ [1]
+= { applying ++ }
+[3,2,1]
+-}
+
+---- ++ operator : [1,2,3] ++ [4,5] = [1,2,3,4,5]
+(++) :: [a] -> [a] -> [a]
+[] ++ ys = ys -- base case
+(x : xs) ++ ys = x : (xs ++ ys) -- recursive case
+{-
+[1,2,3] ++ [4,5]
+= { applying ++ }
+1 : ([2,3] ++ [4,5])
+= { applying ++ }
+1 : (2 : ([3] ++ [4,5]))
+= { applying ++ }
+1 : (2 : (3 : ([] ++ [4,5])))
+= { applying ++ }
+1 : (2 : (3 : [4,5]))
+= { applying : }
+[1,2,3,4,5]
+-}
+
+---- insert: insert 3 [1,2,4,5] = [1,2,3,4,5]
+insert :: (Ord a) => a -> [a] -> [a]
+insert x [] = [x] -- base case
+insert x (y : ys)
+  | x <= y = x : y : ys
+  | otherwise = y : insert x ys -- recursive case
+  {-
+  insert 3 [1,2,4,5]
+  = { applying insert }
+  1 : insert 3 [2,4,5]
+  = { applying insert }
+  1 : (2 : insert 3 [4,5])
+  = { applying insert }
+  1 : (2 : (3 : [4,5]))
+  = { applying : }
+  [1,2,3,4,5]
+  -}
+
+---- insertion sort: isort [3,2,1,4] = [1,2,3,4]
+isort :: (Ord a) => [a] -> [a]
+isort [] = [] -- base case
+isort (x : xs) = insert x (isort xs) -- recursive case
+{-
+isort [3,2,1,4]
+= { applying isort }
+insert 3 (insert 2 (insert 1 (insert 4 [])))
+= { applying insert }
+insert 3 (insert 2 (insert 1 [4]))
+= { applying insert }
+insert 3 (insert 2 [1,4])
+= { applying insert }
+insert 3 [1,2,4]
+= { applying insert }
+[1,2,3,4]
+-}
+
+------------------------------------------------------------------------
+--                          6.3 Multiple arguments                   --
+------------------------------------------------------------------------
+
+---- zip: zip [’a’,’b’,’c’] [1,2,3,4]
+zip :: [a] -> [b] -> [(a, b)]
+zip [] _ = [] -- base case
+zip _ [] = [] -- base case
+zip (x : xs) (y : ys) = (x, y) : zip xs ys -- recursive case
+{-
+zip [’a’,’b’,’c’] [1,2,3,4]
+= { applying zip }
+(’a’,1) : zip [’b’,’c’] [2,3,4]
+= { applying zip }
+(’a’,1) : (’b’,2) : zip [’c’] [3,4]
+= { applying zip }
+(’a’,1) : (’b’,2) : (’c’,3) : zip [] [4]
+= { applying zip }
+(’a’,1) : (’b’,2) : (’c’,3) : []
+= { list notation }
+[(’a’,1), (’b’,2), (’c’,3)]
+-}
+
+---- drop: drop 3 [1,2,3,4,5] = [4,5]
+drop :: Int -> [a] -> [a]
+drop 0 xs = xs -- base case
+drop _ [] = [] -- base case
+drop n (_ : xs) = drop (n - 1) xs -- recursive case
+{-
+drop 3 [1,2,3,4,5]
+= { applying drop }
+drop 2 [2,3,4,5]
+= { applying drop }
+drop 1 [3,4,5]
+= { applying drop }
+drop 0 [4,5]
+= { applying drop }
+[4,5]
+-}
+
+------------------------------------------------------------------------
+--                          6.4 Multiple recursion                   --
+------------------------------------------------------------------------
+
+---- n-Fibonacci numbers: fib 3 = 2
+fib :: Int -> Int
+fib 0 = 0 -- base case
+fib 1 = 1 -- base case
+fib n = fib (n - 1) + fib (n - 2) -- recursive case
+{-
+fib 3
+= { applying fib }
+fib (3 - 1) + fib (3 - 2)
+= { applying fib }
+fib 2 + fib (3 - 2)
+= { applying fib }
+(fib (2 - 1) + fib (2 - 2)) + fib (3 - 2)
+= { applying fib }
+(fib 1 + fib (2 - 2)) + fib (3 - 2)
+= { applying fib }
+(1 + fib (2 - 2)) + fib (3 - 2)
+= { applying fib }
+(1 + fib 0) + fib (3 - 2)
+= { applying fib }
+(1 + 0) + fib (3 - 2)
+= { applying + }
+1 + fib (3 - 2)
+= { applying fib }
+1 + fib 1
+= { applying fib }
+1 + 1
+= { applying + }
+2
+-}
+
+---- quick sort: qsort [3,5,1,4,2] = [1,2,3,4,5]
+qsort :: (Ord a) => [a] -> [a]
+qsort [] = [] -- base case
+qsort (x : xs) = qsort smaller ++ [x] ++ qsort larger -- recursive case
+  where
+    smaller = [a | a <- xs, a <= x]
+    larger = [b | b <- xs, b > x]
+
+{-
+qsort [3,5,1,4,2]
+= { applying qsort }
+qsort [1,2] ++ [3] ++ qsort [5,4]
+= { applying qsort }
+(qsort [] ++ [1] ++ qsort [2]) ++ [3] ++ (qsort [4] ++ [5] ++ qsort [])
+= { applying qsort }
+([] ++ [1] ++ [2]) ++ [3] ++ ([4] ++ [5] ++ [])
+= { applying ++ }
+[1,2] ++ [3] ++ [4,5]
+= { applying ++ }
+[1,2,3,4,5]
+-}
+
+------------------------------------------------------------------------
+--                          6.5 Mutual recursion                     --
+------------------------------------------------------------------------
+
+---- Define even and odd: even 4 = True
+even :: Int -> Bool
+even 0 = True -- base case
+even n = odd (n - 1) -- recursive case
+
+odd :: Int -> Bool
+odd 0 = False -- base case
+odd n = even (n - 1) -- recursive case
+
+{-
+even 4
+= { applying even }
+odd 3
+= { applying odd }
+even 2
+= { applying even }
+odd 1
+= { applying odd }
+even 0
+= { applying even }
+True
+-}
+
+--- Define evens and odds: evens "abcde" = "ace"
+evens :: [a] -> [a]
+evens [] = [] -- base case
+evens (x : xs) = x : odds xs -- recursive case
+
+odds :: [a] -> [a]
+odds [] = [] -- base case
+odds (_ : xs) = evens xs -- recursive case
+
+-- "abcde" is just an abbreviation for [’a’,’b’,’c’,’d’,’e’]
+
+{-
+evens "abcde"
+= { applying evens }
+’a’ : odds "bcde"
+= { applying odds }
+’a’ : evens "cde"
+= { applying evens }
+’a’ : ’c’ : odds "de"
+= { applying odds }
+’a’ : ’c’ : evens "e"
+= { applying evens }
+’a’ : ’c’ : ’e’ : odds []
+= { applying odds }
+’a’ : ’c’ : ’e’ : []
+= { string notation }
+"ace"
+-}
+
+------------------------------------------------------------------------
+--                          6.6 Advice on recursion                  --
+------------------------------------------------------------------------
+
+{-
+Step 1: define the type
+Step 2 : enumerate the cases
+Step 3 : define the simple cases
+Step 4 : define the other cases
+Step 5 : generalise and simplify
+-}

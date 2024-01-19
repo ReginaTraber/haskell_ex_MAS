@@ -1,6 +1,12 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use isAsciiLower" #-}
 module Exercises where
 
-import Prelude hiding (replicate)
+import System.IO (localeEncoding)
+import Prelude hiding (concat, length, replicate, zip)
+
+-- import Exercises (test)
 
 ------------------------------------------------------------------------
 --                          Exercise 5.1 (**)                         --
@@ -170,3 +176,180 @@ scalarproduct xs ys = sum [x * y | (x, y) <- xs `zip` ys]
 -- Modify the Caesar cipher program to also handle upper-case letters.
 
 -- Not done
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+--                          Book                                      --
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+--                          5.1 Basic concepts                        --
+------------------------------------------------------------------------
+-- list of all numbers between 1 and 5 squared
+test1 :: (Num a, Enum a) => [a]
+test1 = [x ^ 2 | x <- [1 .. 5]]
+
+-- test1 = [1,4,9,16,25]
+
+-- list of all possible pairings of an element from the list
+-- [1, 2, 3] with an element from the list [4, 5]
+test2 :: (Num a, Enum a) => [(a, a)]
+test2 = [(x, y) | x <- [1, 2, 3], y <- [4, 5]]
+
+-- test2 = [(1,4),(1,5),(2,4),(2,5),(3,4),(3,5)]
+
+-- list of all possible pairings of an element from the list
+-- [4, 5] with an element from the list [1, 2, 3]
+test3 :: (Num a, Enum a) => [(a, a)]
+test3 = [(x, y) | y <- [4, 5], x <- [1, 2, 3]]
+
+-- test3 = [(1,4),(2,4),(3,4),(1,5),(2,5),(3,5)]
+
+-- concatenates a list of lists
+concat :: [[a]] -> [a]
+concat xss = [x | xs <- xss, x <- xs]
+
+-- concat [[1,2,3],[4,5],[6]] = [1,2,3,4,5,6]
+-- concat [[]] = []
+
+-- selects all the first components from a list of pairs
+firsts :: [(a, b)] -> [a]
+firsts ps = [x | (x, _) <- ps]
+
+-- the generator _ <- xs simply serves as a counter to govern
+-- the production of the appropriate number of ones
+-- firsts [(1,2),(3,4)] = [1,3]
+-- firsts [(1,2)] = [1]
+-- firsts [] = []
+
+-- length of a list
+length :: [a] -> Int
+length xs = sum [1 | _ <- xs]
+
+-- length [1,2,3] = 3
+-- length [] = 0
+
+------------------------------------------------------------------------
+--                          5.2 Guards                                 --
+------------------------------------------------------------------------
+
+---- list of all numbers between 1 and 10 that are even
+test4 :: [Int]
+test4 = [x | x <- [1 .. 10], even x]
+
+-- test4 = [2,4,6,8,10]
+
+---- a function that maps a positive integer to its list of positive factors
+factors' :: Int -> [Int]
+factors' n = [x | x <- [1 .. n], n `mod` x == 0]
+
+-- factors' 15 = [1,3,5,15]
+-- factors' 7 = [1,7]
+-- factor 0 = error
+-- factors' (-5) = []
+
+{-
+mod :: Integral a => a -> a -> a
+mod x y = x - y * (x `div` y)
+-- mod 10 0 = *** Exception: divide by zero
+-- mod 10 3 = 1
+-- 10 `mod` 3 = 1
+-}
+
+---- a function that decides if a number is prime
+prime :: Int -> Bool
+prime n = factors' n == [1, n]
+
+-- prime 15 = False --lazy evaluation is used
+-- prime 7 = True
+
+----produces the list of all prime numbers up to a given limit
+primes :: Int -> [Int]
+primes n = [x | x <- [2 .. n], prime x]
+
+-- primes 40 = [2,3,5,7,11,13,17,19,23,29,31,37]
+-- prime -1 = errror
+-- prime 0 = False
+
+---returns the list of all values that are associated with a given key in a table
+find' :: (Eq a1) => a1 -> [(a1, a2)] -> [a2]
+find' k t = [v | (k', v) <- t, k == k']
+
+-- find' 'b' [('a',1),('b',2),('c',3),('b',4)] = [2,4]
+-- find' 'd' [('a',1),('b',2),('c',3),('b',4)] = []
+-- find' 1 [(1,'a'),(2,'b'),(3,'c'),(2,'d')] = ['a']
+
+------------------------------------------------------------------------
+--                          5.3 The zip function                       --
+------------------------------------------------------------------------
+
+---- a new list by pairing successive elements from two existing lists until
+---- either or both lists are exhausted
+zip :: [a] -> [b] -> [(a, b)]
+zip [] _ = []
+zip _ [] = []
+zip (x : xs) (y : ys) = (x, y) : zip xs ys
+
+-- zip [’a’,’b’,’c’] [1,2,3,4] = [(’a’,1),(’b’,2),(’c’,3)]
+
+---- returns the list of all pairs of adjacent (benachbarte) elements from a list
+pairs :: [a] -> [(a, a)]
+pairs xs = zip xs (tail xs)
+
+-- pairs [1,7,3,1,5] = [(1,7),(7,3),(3,1),(1,5)]
+{-
+tail :: [a] -> [a]
+tail (_ : xs) = xs
+-- tail [1,2,3] = [2,3]
+-}
+
+---- decides if a list of elements of any ordered type is
+----sorted by simply checking that all pairs of adjacent elements
+----from the list are in the correct order
+sorted :: (Ord a) => [a] -> Bool
+sorted xs = and [x <= y | (x, y) <- pairs xs]
+
+-- sorted [1,2,3,4] = True
+-- sorted [1,3,2,4] = False --lazy evaluation is used
+{-
+and :: [Bool] -> Bool
+and [] = True
+and (b : bs) = b && and bs
+-- and [True,True,False] = False
+-- and [True,True,True] = True
+-}
+
+---- returns the list of all positions at which a value occurs in a list
+positions' :: (Eq a) => a -> [a] -> [Int]
+positions' x xs = [i | (x', i) <- zip xs [0 ..], x == x']
+
+-- positions' 'a' "abracadabra" = [0,3,5,7,10]
+-- positions' 1 [1,2,3,1,4] = [0,3]
+-- positions' True [False,True,False,True] = [1,3]
+-- positions' 1 [] = []
+-- positions' 1 [2,3,4] = []
+
+------------------------------------------------------------------------
+--                          5.4 String comprehensions                  --
+------------------------------------------------------------------------
+
+---- returns the number of lower-case letters in a string
+lowers :: String -> Int
+lowers xs = length [x | x <- xs, x >= 'a' && x <= 'z']
+
+-- lowers "Haskell" = 6
+
+---- returns the number of a particular character in a string
+count :: Char -> String -> Int
+count x xs = length [x' | x' <- xs, x == x']
+
+-- count 's' "Mississippi" = 4
+
+{-
+length' :: [a] -> Int
+length' xs = sum [1 | _ <- xs]
+-- length' [1,2,3] = 3
+-- length' [] = 0
+-- length' "abc" = 3
+-}

@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use foldr" #-}
 module Exercises where
 
 import Prelude hiding (product)
@@ -9,8 +12,10 @@ import Prelude hiding (product)
 -- book Programming in Haskell.  Give another possible calculation for the
 -- result of `double (double 2)`.
 
--- from the book, page 3 and 4
+double :: Num a => a -> a
+double x = x + x
 
+-- from the book, page 3 and 4
 {-
 double (double 2)
 = { applying the inner double }
@@ -98,9 +103,9 @@ x
 -- Define the function 'product' that produces the product of a list of numbers,
 -- and show using your definition that product [2,3,4] == 24.
 
--- product :: Num p => [p] -> p --type declaration
--- product [] = 1 --base case
--- product (n:ns) = n * product ns --recursive case
+product :: (Num p) => [p] -> p -- type declaration
+product [] = 1 -- base case
+product (n : ns) = n * product ns -- recursive case
 
 {-
 product [2,3,4]
@@ -116,29 +121,28 @@ product [2,3,4]
 24
 -}
 
-------------------------------------------------------------------------
+-----------------------------------------------------------------------
 --                          Exercise 1.4 (*)                          --
 ------------------------------------------------------------------------
 -- How should the definition of the function qsort be modified so that it produces a reverse sorted
 -- version of a list?
 
+{-
 -- original definition
-
--- qsort :: Ord a => [a] -> [a] --type declaration
--- qsort [] = [] --base case
--- qsort (x:xs) = qsort smaller ++ [x] ++ qsort larger --recursive case
---                where
---                  smaller = [a | a <- xs, a <= x]
---                  larger  = [b | b <- xs, b > x]
+qsort :: (Ord a) => [a] -> [a] -- type declaration
+qsort [] = [] -- base case
+qsort (x : xs) = qsort smaller ++ [x] ++ qsort larger -- recursive case
+  where
+    smaller = [a | a <- xs, a <= x]
+    larger = [b | b <- xs, b > x]
 
 -- modified definition
-{-
-qsort :: Ord a => [a] -> [a] --type declaration
-qsort [] = [] --base case
-qsort (x:xs) = qsort larger ++ [x] ++ qsort smaller --recursive case
-               where
-                 smaller = [a | a <- xs, a <= x]
-                 larger  = [b | b <- xs, b > x]
+qsort :: (Ord a) => [a] -> [a] -- type declaration
+qsort [] = [] -- base case
+qsort (x : xs) = qsort larger ++ [x] ++ qsort smaller -- recursive case
+  where
+    smaller = [a | a <- xs, a <= x]
+    larger = [b | b <- xs, b > x]
 -}
 
 ------------------------------------------------------------------------

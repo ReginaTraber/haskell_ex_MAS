@@ -9,6 +9,7 @@ module Exercises where
 -- below.
 
 {-
+$ ghci
 ghci> 2+3*4
 14
 ghci> (2+3)*4
@@ -85,8 +86,8 @@ e_2_2_c = 2 + (3 * (4 ^ 5))
 -- The script below contains three syntactic errors. Correct these errors and then
 -- check that your script works properly using GHCi.
 
-computeN :: Int
-computeN = a `div` length xs
+-- n :: Int
+n = a `div` length xs
   where
     a = 10
     xs = [1, 2, 3, 4, 5]
