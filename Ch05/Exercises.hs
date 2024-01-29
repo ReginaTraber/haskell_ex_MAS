@@ -193,14 +193,14 @@ test1 = [x ^ 2 | x <- [1 .. 5]]
 -- test1 = [1,4,9,16,25]
 
 -- list of all possible pairings of an element from the list
--- [1, 2, 3] with an element from the list [4, 5]
+-- [1, 2, 3] (x-value) with an element from the list [4, 5] (y-value)
 test2 :: (Num a, Enum a) => [(a, a)]
 test2 = [(x, y) | x <- [1, 2, 3], y <- [4, 5]]
 
 -- test2 = [(1,4),(1,5),(2,4),(2,5),(3,4),(3,5)]
 
--- list of all possible pairings of an element from the list
--- [4, 5] with an element from the list [1, 2, 3]
+-- list of all possible pairings of an element from the list [4, 5]
+-- (y-value) with an element from the list [1, 2, 3] (x-value)
 test3 :: (Num a, Enum a) => [(a, a)]
 test3 = [(x, y) | y <- [4, 5], x <- [1, 2, 3]]
 
