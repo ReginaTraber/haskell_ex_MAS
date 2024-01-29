@@ -456,11 +456,15 @@ tail (_ : xs) = xs
 --                             Lambda expressions                            --
 -------------------------------------------------------------------------------
 
----- add two numbers ----
+---- add two times the same numbers ----
 -- console: ghci
--- ghci> (\x -> x + x) 2
--- 4
+-- ghci> (\x -> x + x) 3
+-- 6
 
+-- \x -> x + x is a lambda expression with type Int -> Int
+
+
+---- add two numbers ----
 add :: Int -> Int -> Int
 add x y = x + y
 
@@ -473,6 +477,7 @@ add' = \x -> (\y -> x + y)
 ---- takes two arguments and returns a list containing only the first argument ---
 const :: a -> b -> [a]
 const x _ = [x]
+-- const x y = [x]
 
 -- const [1,2,3] 4 = [[1,2,3]]
 -- const (1,2) 3 = [(1,2)]
@@ -480,6 +485,9 @@ const x _ = [x]
 -- lambda expression
 const' :: a -> b -> [a]
 const' = \x -> (\_ -> [x])
+-- const' = \x -> \_ -> [x]
+-- const' = \x -> \y -> [x]
+
 
 ---- returns the first n odd integers in list ---
 odds :: Int -> [Int]

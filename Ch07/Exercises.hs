@@ -10,9 +10,14 @@
 {-# HLINT ignore "Eta reduce" #-}
 {-# HLINT ignore "Avoid lambda" #-}
 {-# HLINT ignore "Use odd" #-}
+{-# HLINT ignore "Use foldr" #-}
+{-# HLINT ignore "Use sum" #-}
+{-# HLINT ignore "Use product" #-}
+{-# HLINT ignore "Use or" #-}
+{-# HLINT ignore "Use and" #-}
 module Exercises where
 
-import Prelude hiding (any, curry, dropWhile, filter, id, map, takeWhile, uncurry, (.))
+import Prelude hiding (and, any, curry, dropWhile, filter, foldl, foldr, id, length, map, or, product, reverse, sum, takeWhile, uncurry, (.))
 
 
 ------------------------------------------------------------------------
@@ -111,12 +116,21 @@ dec2int = foldl (\x y -> 10 * x + y) 0
 -- Hint: first write down the types of the two functions.
 
 curry :: ((a,b) -> c) -> (a -> b -> c)
-curry f = \x y -> f (x,y)
+curry f = \x y -> f (x, y)
+
+-- f(x,y) is element of type c
+-- Mathematically : given a function f : X × Y → Z currying transforms it into a function f' : X → (Y → Z)
 
 
 uncurry :: (a -> b -> c) -> ((a,b) -> c)
 uncurry f = \(x,y) -> f x y
+-- Mathematically : given a function f : X → (Y → Z) uncurrying transforms it into a function f' : X × Y → Z
 
+-- g:: (Int, Int) -> Int
+-- g (x,y) = x + y
+
+-- h :: Int -> Int -> Int
+-- h x y = x + y
 
 {-
   `curry` and `uncurry` functions provide a concise way to convert between curried and uncurried forms of functions.
@@ -388,3 +402,147 @@ twice' f = f . f
 -- sumsqreven' ns = sum (map (^ 2) (filter even ns))
 sumsqreven' :: [Int] -> Int
 sumsqreven' = sum . map (^ 2) . filter even
+
+------------------------------------------------------------------------
+-- foldr -- fold right
+------------------------------------------------------------------------
+
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr f v [] = v
+foldr f v (x : xs) = f x (foldr f v xs)
+
+-- summing a list of numbers
+-- applying foldr (+) 0 to the list [1,2,3,4]
+-- foldr (+) 0 [1,2,3,4]
+-- foldr (+) 0 (1 : (2 : (3 : (4 : [])))) = 1 + (2 + (3 + (4 + 0)))
+-- foldr f v [x1,x2...xn] = x1 `f` (x2 `f` ... (xn `f` v)...)
+
+-- -- sum: summing a list of numbers
+-- sum :: (Num a) => [a] -> a
+-- sum [] = 0
+-- sum (x : xs) = x + sum xs
+
+-- sum' :: (Num a) => [a] -> a
+-- sum' = foldr (+) 0
+
+-- -- product: multiplying a list of numbers
+-- product :: (Num a) => [a] -> a
+-- product [] = 1
+-- product (x : xs) = x * product xs
+
+-- product' :: (Num a) => [a] -> a
+-- product' = foldr (*) 1
+
+-- -- or: combining a list of boolean values using the logical disjunction operator ||
+-- or :: [Bool] -> Bool
+-- or [] = False
+-- or (x : xs) = x || or xs
+
+-- or' :: [Bool] -> Bool
+-- or' = foldr (||) False
+
+-- -- and: combining a list of boolean values using the logical conjunction operator &&
+-- and :: [Bool] -> Bool
+-- and [] = True
+-- and (x : xs) = x && and xs
+
+-- and' :: [Bool] -> Bool
+-- and' = foldr (&&) True
+
+-- -- length: computing the length of a list
+-- length :: [a] -> Int
+-- length [] = 0
+-- length (_ : xs) = 1 + length xs
+
+-- length' :: [a] -> Int
+-- length' = foldr (\_ n -> 1 + n) 0
+
+-- -- reverse: reversing a list
+-- reverse :: [a] -> [a]
+-- reverse [] = []
+-- reverse (x : xs) = reverse xs ++ [x]
+
+-- -- reverse [] = []
+-- -- reverse (x : xs) = snoc x (reverse xs)
+
+-- -- snoc: appending an element to the end of a list
+-- -- snoc :: a -> [a] -> [a]
+-- -- snoc x xs = xs ++ [x]
+-- -- snoc [1,2,3] 4 = [1,2,3,4]
+
+-- reverse' :: [a] -> [a]
+-- reverse' = foldr (\x xs -> xs ++ [x]) []
+
+-- -- reverse' :: [a] -> [a]
+-- -- reverse' = foldr snoc []
+
+------------------------------------------------------------------------
+-- foldl -- fold left
+------------------------------------------------------------------------
+
+foldl :: (a -> b -> a) -> a -> [b] -> a
+foldl f v [] = v
+foldl f v (x : xs) = foldl f (f v x) xs
+
+-- summing a list of numbers
+-- applying foldl (+) 0 to the list [1,2,3,4]
+-- foldl (+) 0 [1,2,3,4] = (((0 + 1) + 2) + 3) + 4
+
+-- sum: summing a list of numbers
+sum :: (Num a) => [a] -> a
+sum [] = 0
+sum (x : xs) = x + sum xs
+
+sum' :: (Num a) => [a] -> a
+sum' = foldl (+) 0
+
+-- product: multiplying a list of numbers
+product :: (Num a) => [a] -> a
+product [] = 1
+product (x : xs) = x * product xs
+
+product' :: (Num a) => [a] -> a
+product' = foldl (*) 1
+
+-- or: combining a list of boolean values using the logical disjunction operator ||
+or :: [Bool] -> Bool
+or [] = False
+or (x : xs) = x || or xs
+
+or' :: [Bool] -> Bool
+or' = foldl (||) False
+
+-- and: combining a list of boolean values using the logical conjunction operator &&
+and :: [Bool] -> Bool
+and [] = True
+and (x : xs) = x && and xs
+
+and' :: [Bool] -> Bool
+and' = foldl (&&) True
+
+-- length: computing the length of a list
+length :: [a] -> Int
+length [] = 0
+length (_ : xs) = 1 + length xs
+
+length' :: [a] -> Int
+length' = foldl (\n _ -> 1 + n) 0
+
+-- reverse: reversing a list
+reverse :: [a] -> [a]
+reverse [] = []
+reverse (x : xs) = reverse xs ++ [x]
+
+-- reverse [] = []
+-- reverse (x : xs) = snoc x (reverse xs)
+
+-- snoc: appending an element to the end of a list
+-- snoc :: a -> [a] -> [a]
+-- snoc x xs = xs ++ [x]
+-- snoc [1,2,3] 4 = [1,2,3,4]
+
+reverse' :: [a] -> [a]
+reverse' = foldl (\xs x -> x : xs) []
+
+-- reverse' :: [a] -> [a]
+-- reverse' = foldl snoc []
